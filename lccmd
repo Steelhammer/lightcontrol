@@ -1,0 +1,654 @@
+#!/usr/bin/perl
+
+=pod
+
+   _ _       _     _                  _             _   
+  | (_) __ _| |__ | |_ ___ ___  _ __ | |_ _ __ ___ | |  
+  | | |/ _` | '_ \| __/ __/ _ \| '_ \| __| '__/ _ \| |  
+  | | | (_| | | | | || (_| (_) | | | | |_| | | (_) | |  
+  |_|_|\__, |_| |_|\__\___\___/|_| |_|\__|_|  \___/|_|  
+       |___/                                            
+
+  lightcontrol - Light control using the Tellstick
+  Copyright (C) 2012  Fredrik Stalhammar
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    
+  Inspired by the works of http://www.telldus.se/
+
+  https://github.com/Steelhammer/lightcontrol
+
+=cut
+
+=head1 lccmd
+
+Command line tool for the light controller.
+
+The description of the lccmd options is available through the tool help.
+
+ lccmd --help
+ 
+ lccmd version: 2.0.0
+ 
+ Usage: lccmd --<option> <argument(s)>
+ 
+ --on <id>
+ 	id - id of the receiver to handle
+ 	Activate the receiver with id <id>
+ 	Returns OK - <id>/FAIL
+ --off <id>
+ 	id - id of the receiver to handle
+ 	Deactivate the receiver with id <id>
+ 	Returns OK - <id>/FAIL
+ --dim <id> <level>
+ 	id - id of the receiver to handle
+ 	level - dim level, 0<=level<=15
+ 	Dim the receiver with id <id> to level <level>
+ 	Returns OK - <id>/FAIL
+ --learn <id>
+ 	id - id of the receiver to handle
+ 	Learn the receiver with id <id>
+ 	Requires an existing receiver, see '--addreceiver'
+ 	Returns OK - <id>/FAIL
+ --addreceiver <name> <isdimmer>
+ 	name - Description of the receiver, e.g. Kitchen - Window
+ 	isdimmer -
+ 		1 - Receiver is a dimmer
+ 		0 - Receiver is not a dimmer
+ 	The receiver will be assigned an ID
+ 	Returns OK - <id>/FAIL
+ --getreceiver <id>
+ 	id (optional) - display information for this receiver.
+    Information for all receivers will be diplayed, if omitted.
+ 	Returns a list of the configured receivers
+ 	ID<tab>Name<tab>House code<tab>Unit code<tab>Dimmer<tab>Status<tab>Learned
+ --editreceiver <id> <name> <isdimmer>
+ 	id - ID of a configured receiver
+ 	name - Description of the receiver, e.g. Kitchen - Window
+ 	isdimmer - Hardware ID of the receiver to handle
+ 	Edit a receiver in the database.
+ 	Returns OK - id/FAIL
+ --deletereceiver <id>
+ 	id - ID of a configured receiver
+ 	Delete a receiver from the database.
+ 	This command will also delete all timers using this receiver.
+ 	Returns OK - <id>/FAIL
+ --status <id>
+ 	id (optional)- ID of a configured receiver
+ 		Status for all receivers will be diplayed, if omitted.
+ 	Returns the receiver status.
+ --reset
+ 	Turn off all receivers and re-initate all timers.
+ 	Returns OK/FAIL
+ --gettimer <receiverid>
+ 	receiverid (optional) - display information for timers set for this receiver.
+ 		Information for all timers will be diplayed, if omitted.
+ 	Returns a list of the configured timers
+ 	ID<tab>Receiver ID<tab>On time<tab>Off time<tab>Days<tab>Dim level
+ --addtimer <receiverid> <ontime> <offtime> <daysofweek> <dimlevel>
+ 	receiverid - ID of the receiver to set timer for.
+ 	ontime - when to activate the receiver.
+ 	offtime - when to deactivate the receiver.
+ 	Valid formats:
+ 		hh:mm[Rmmm] - hour:minute +RANDOM minutes. E.g. 19:30R30 = 19:31 - 20:00
+ 		SUNRISE|SUNSET[+-mmm] - Sunrise/Sunset +- minutes E.g. SUNSET-20
+ 	daysofweek - the days of the week the timer is active.
+ 		E.g. 1234567 - all days, 567 - Fr, Sa, Su
+ 	dimlevel - Set this level when activating the timer.
+ 		0      : No dimming, turn on full.
+ 		1 - 15 : Level to use
+ 		Setting will be ignored for non dimmable receivers.
+ 	Add a new timer setting for a given receiver.
+ 	Returns OK - id/FAIL
+ --edittimer <timerid> <ontime> <offtime> <daysofweek> <dimlevel>
+ 	timerid - ID of the timer to edit.
+ 	ontime - when to activate the receiver.
+ 	offtime - when to deactivate the receiver.
+ 	daysofweek - the days of the week the timer is active.
+ 	dimlevel - Set this level when activating the timer.
+ 	Examples, see --addtimer
+ 	Edit the settings of an existing timer.
+ 	Returns OK - id/FAIL
+ --deletetimer <id>
+ 	id - ID of a timer setting.
+ 	Delete a timer setting.
+ 	Returns OK/FAIL
+ --getlog <lines>
+ 	lines (optional)- Number of lines to display.
+ 		10 lines will be returned, if omitted.
+ 	Returns the last <lines> lines of the log.
+ --license
+ 	Display the license information.
+ --help
+ 	Display this information.
+ 
+ by Fredrik Stalhammar 2008-2012
+
+=cut
+
+
+use strict;
+require "lcCore.pm";
+use Getopt::Long;
+
+my $recon_opt;
+my $recoff_opt;
+my @recdim_opt;
+my $reclearn_opt;
+my $getrec_opt;
+my @addrec_opt;
+my @editrec_opt;
+my $delrec_opt;
+my $getrecstatus_opt;
+my $resetstatus_opt;
+
+my $gettimer_opt;
+my @addtimer_opt;
+my @edittimer_opt;
+my $deltimer_opt;
+
+my $getlog_opt;
+my $getlicense_opt;
+my $help_opt;
+
+my %userPrefs = GetConfiguration();
+
+my $result = GetOptions('on=i'                      => \$recon_opt,    #OK
+                        'off=i'                     => \$recoff_opt,   #OK
+                        'dim=s{2}'                  => \@recdim_opt,   #OK
+                        'learn=s'                   => \$reclearn_opt, #OK
+                        'getreceiver:i'             => \$getrec_opt,   #OK
+                        'addreceiver=s{2}'          => \@addrec_opt,   #OK
+                        'editreceiver=s{3}'         => \@editrec_opt,  #OK
+                        'deletereceiver=s'          => \$delrec_opt,   #OK
+                        'status:i'                  => \$getrecstatus_opt,    #OK
+                        'reset'                     => \$resetstatus_opt,     #OK
+                        
+                        'gettimer:i'                => \$gettimer_opt,    #OK
+                        'addtimer=s{5}'             => \@addtimer_opt,    #OK
+                        'edittimer=s{5}'            => \@edittimer_opt,   #OK
+                        'deletetimer=s'             => \$deltimer_opt,    #OK
+                        
+                        'getlog:i'                  => \$getlog_opt, #OK
+                        'license'                   => \$getlicense_opt, 
+                        'help'                      => \$help_opt);  #OK
+
+
+if ($result)
+{
+  if (
+       defined($help_opt) xor
+       defined($recon_opt) xor
+       defined($recoff_opt) xor
+       @recdim_opt xor
+       defined($reclearn_opt) xor
+       defined($getrec_opt) xor
+       @addrec_opt xor
+       @editrec_opt xor
+       defined($delrec_opt) xor
+       defined($getrecstatus_opt) xor
+       defined($resetstatus_opt) xor
+       defined($gettimer_opt) xor
+       @addtimer_opt xor
+       @edittimer_opt xor
+       defined($deltimer_opt) xor  
+       defined($getlicense_opt) xor
+       defined($getlog_opt)
+     )
+  {
+    if (defined($help_opt))
+    {
+      lccmdUsage();
+    }
+    elsif (defined($getlicense_opt))
+    {
+      lcLicenseInfo();
+    }
+    elsif ($recon_opt)
+    {
+      my %receivers = GetReceiversById();
+      if (defined ($receivers{$recon_opt}))
+      {
+        if ($receivers{$recon_opt}->ReceiverActivate())
+        {
+          PrintToLog("Receiver: '".$receivers{$recon_opt}->ReceiverName()."' - ON");
+          print "OK - $recon_opt\n";
+        }
+        else
+        {
+          print "FAIL - Error sending command\n";
+        }
+      }
+      else
+      {
+        print "FAIL - Unknown receiver: $recon_opt\n";
+      }
+    }
+    elsif ($recoff_opt)
+    {
+      my %receivers = GetReceiversById();
+      if (defined ($receivers{$recoff_opt}))
+      {
+        if ($receivers{$recoff_opt}->ReceiverDeactivate())
+        {
+          PrintToLog("Receiver: '".$receivers{$recoff_opt}->ReceiverName()."' - OFF");
+          print "OK - $recoff_opt\n";
+        }
+        else
+        {
+          print "FAIL - Error sending command\n";
+        }
+      }
+      else
+      {
+        print "FAIL - Unknown receiver: $recoff_opt\n";
+      }
+    }
+    elsif (@recdim_opt)
+    {
+      my ($recid, $level) = @recdim_opt;
+      my %receivers = GetReceiversById();
+      if (defined ($receivers{$recid}))
+      {
+        if (($level>=0) and ($level<=15))
+        {
+          if ($receivers{$recid}->ReceiverDim($level))
+          {
+            if ($level==0)
+            {
+              PrintToLog("Receiver: '".$receivers{$recid}->ReceiverName()."' - OFF");  
+            }
+            elsif ($level==15)
+            {
+              PrintToLog("Receiver: '".$receivers{$recid}->ReceiverName()."' - ON");
+            }
+            else
+            {
+              PrintToLog("Receiver: '".$receivers{$recid}->ReceiverName()."' - Dimmed: ".$level);
+            }
+            print "OK - $recid\n";
+          }
+          else
+          {
+            print "FAIL - Error sending command\n";
+          }
+        }
+        else
+        {
+          print "FAIL - Dim level out of range\n";
+        }
+      }
+      else
+      {
+        print "FAIL - Unknown receiver: $recid\n";
+      }
+    }
+    elsif ($reclearn_opt)
+    {
+      my %receivers = GetReceiversById();
+      if (defined ($receivers{$reclearn_opt}))
+      {
+        if ($receivers{$reclearn_opt}->ReceiverLearn())
+        {
+          PrintToLog("Receiver: Learning '".$receivers{$reclearn_opt}->ReceiverName()."'");
+          print "OK - $reclearn_opt\n";
+        }
+        else
+        {
+          print "FAIL - Error sending command\n";
+        }
+      }
+      else
+      {
+        print "FAIL - Unknown receiver: $reclearn_opt\n";
+      }
+    }
+    elsif (defined($getrec_opt))
+    {
+      my $recText = GetReceiversRaw($getrec_opt);
+      print $recText;
+    }
+    elsif (@addrec_opt)
+    {
+      my ($recname, $isDimmer) = @addrec_opt;
+      
+      $recname =~ s/\s+$//;
+      $recname =~ s/^\s+//;
+
+      if (length($recname) > 0)
+      {
+        if ($isDimmer==1 or $isDimmer==0)
+        {
+          my $addResult = AddReceiver($recname, $isDimmer);
+          if ($addResult > 0)
+          {
+            print "OK - $addResult\n";
+          }
+          else
+          {
+            print "FAIL - Receiver name: '$recname' is in use\n";
+          }
+        }
+        else
+        {
+          print "FAIL - <dimmer> most be 0 or 1\n";
+        }
+      }
+      else
+      {
+        print "FAIL - Receiver name empty\n";
+      }
+    }
+    elsif (@editrec_opt)
+    {
+      my ($recid, $recname, $isDimmer) = @editrec_opt;
+      my %receivers = GetReceiversById();
+      if (defined ($receivers{$recid}))
+      {
+        $recname =~ s/\s+$//;
+        $recname =~ s/^\s+//;
+        if (length($recname) > 0)
+        {
+          if ($isDimmer==1 or $isDimmer==0)
+          {
+            if (UpdateReceiver($recid, $recname, $isDimmer))
+            {
+              print "OK - $recid\n";
+            }
+            else
+            {
+              print "FAIL - Receiver name: $recname is in use\n";
+            }
+          }
+          else
+          {
+            print "FAIL - <dimmer> most be 0 or 1\n";
+          }
+        }
+        else
+        {
+          print "FAIL - Receiver name empty\n";
+        }
+      }
+      else
+      {
+        print "FAIL - Receiver $recid not found\n";
+      }
+    }
+    elsif ($delrec_opt)
+    {
+      if (DeleteReceiver($delrec_opt))
+      {
+        print "OK - $delrec_opt\n";
+      }
+      else
+      {
+        print "FAIL - $delrec_opt not found\n";
+      }
+    }
+    elsif (defined($getrecstatus_opt))
+    {
+      my $recStatus = GetReceiverStatus($getrecstatus_opt);
+      print $recStatus; 
+    }
+    elsif ($resetstatus_opt)
+    {
+      if (ResetReceiverStatus())
+      {
+        print "OK\n";
+      }
+      else
+      {
+        print "FAIL\n";
+      }
+    }
+    elsif (defined($gettimer_opt))
+    {
+      my $timText = GetTimers($gettimer_opt);
+      print $timText;
+    }
+    elsif (@addtimer_opt)
+    {
+      my ($receiverId, $onTime, $offTime, $repDays, $dimlevel) = @addtimer_opt;
+      
+      #my %receivers = GetReceiversById();
+      #if (defined ($receivers{$receiverId}))
+      if (ReceiverExists($receiverId))
+      {
+        if (($onTime=~/^((\d{1,2}:\d{2})|SUNSET|SUNRISE)(\+|-|R|)?\d{0,4}$/) and
+            ($offTime=~/^((\d{1,2}:\d{2})|SUNSET|SUNRISE)(\+|-|R|)?\d{0,4}$/) and
+            ($repDays=~/^1?2?3?4?5?6?7?$/) and
+            (($dimlevel>=0) and ($dimlevel<=15))
+            )
+        {
+          my $newTimerId = AddNewTimer($receiverId, $onTime, $offTime, $repDays, $dimlevel);   
+          if ($newTimerId)
+          {
+            print "OK - $newTimerId\n";
+          }
+          else
+          {
+            print "FAIL\n";
+          }
+        }
+        else
+        {
+          print "FAIL - Incorrect parameter format\n";
+        }
+      }
+      else
+      {
+        print "FAIL - Unknown receiver: $receiverId\n";
+      }
+    }
+    elsif (@edittimer_opt)
+    {
+      my ($timerId, $onTime, $offTime, $repDays, $dimlevel) = @edittimer_opt;
+      #Check that the receiver exists
+      if (TimerExists($timerId))
+      {
+        if (($onTime=~/^((\d{1,2}:\d{2})|SUNSET|SUNRISE)(\+|-|R|)?\d{0,4}$/) and
+            ($offTime=~/^((\d{1,2}:\d{2})|SUNSET|SUNRISE)(\+|-|R|)?\d{0,4}$/) and
+            ($repDays=~/^1?2?3?4?5?6?7?$/) and
+              (($dimlevel>=0) and ($dimlevel<=15))
+              )
+        {
+          my $updatedTimer = EditTimer($timerId, $onTime, $offTime, $repDays, $dimlevel); 
+          if ($updatedTimer)
+          {
+            print "OK - $updatedTimer\n";
+          }
+          else
+          {
+            print "FAIL\n";
+          }
+        }
+        else
+        {
+          print "FAIL - Incorrect parameter format\n";
+        } 
+      }
+      else
+      {
+        print "FAIL - Unknown timer: $timerId\n";
+      }
+    }
+    elsif ($deltimer_opt)
+    {
+      my $deletedTimer = DeleteTimer($deltimer_opt);
+      if ($deletedTimer)
+      {
+        print "OK - $deletedTimer\n";
+      }
+      else
+      {
+        print "FAIL - $deltimer_opt not found\n";
+      }
+    }
+    elsif (defined($getlog_opt))
+    {
+      $getlog_opt = $getlog_opt ? $getlog_opt : 10;
+      my $logText = GetLog($getlog_opt);
+      print $logText;
+    }
+  }
+  else
+  {
+    print "FAIL - ONE option required.\nUse --help for more information\n";
+  }
+}
+
+=head2 lccmdUsage()
+
+=over 2
+
+=item * I<parameters: none>
+
+=item * I<returns: (integer) 1>
+
+=back
+
+Displays the tool help, see L</"lccmd">
+
+=cut
+
+sub lccmdUsage
+{
+  my $PROG_NAME = "lccmd";
+  my $PROG_VERSION = "2.0.0";
+  
+  print("\n$PROG_NAME version: $PROG_VERSION\n\n");
+  print("Usage: $PROG_NAME --<option> <argument(s)>\n");  
+  print("\n");
+  print("--on <id>\n");
+  print("\tid - id of the receiver to handle\n");
+  print("\tActivate the receiver with id <id>\n");
+  print("\tReturns OK - <id>/FAIL\n");
+  print("--off <id>\n");
+  print("\tid - id of the receiver to handle\n");
+  print("\tDeactivate the receiver with id <id>\n");
+  print("\tReturns OK - <id>/FAIL\n");
+  print("--dim <id> <level>\n");
+  print("\tid - id of the receiver to handle\n");
+  print("\tlevel - dim level, 0<=level<=15\n");
+  print("\tDim the receiver with id <id> to level <level>\n");
+  print("\tReturns OK - <id>/FAIL\n");
+  print("--learn <id>\n");
+  print("\tid - id of the receiver to handle\n");
+  print("\tLearn the receiver with id <id>\n");
+  print("\tRequires an existing receiver, see '--addreceiver'\n");
+  print("\tReturns OK - <id>/FAIL\n");
+  print("--addreceiver <name> <isdimmer>\n");
+  print("\tname - Description of the receiver, e.g. Kitchen - Window\n");
+  print("\tisdimmer -\n");
+  print("\t\t1 - Receiver is a dimmer\n");
+  print("\t\t0 - Receiver is not a dimmer\n");
+  print("\tThe receiver will be assigned an ID\n");
+  print("\tReturns OK - <id>/FAIL\n");
+  print("--getreceiver <id>\n");
+  print("\tid (optional) - display information for this receiver.\n");
+  print("\t\tInformation for all receivers will be diplayed, if omitted.\n");
+  print("\tReturns a list of the configured receivers\n");
+  print("\tID<tab>Name<tab>House code<tab>Unit code<tab>Dimmer<tab>Status<tab>Learned\n");
+  print("--editreceiver <id> <name> <isdimmer>\n");
+  print("\tid - ID of a configured receiver\n");
+  print("\tname - Description of the receiver, e.g. Kitchen - Window\n");
+  print("\tisdimmer - Hardware ID of the receiver to handle\n");
+  print("\tEdit a receiver in the database.\n");
+  print("\tReturns OK - id/FAIL\n");  
+  print("--deletereceiver <id>\n");
+  print("\tid - ID of a configured receiver\n");
+  print("\tDelete a receiver from the database.\n");
+  print("\tThis command will also delete all timers using this receiver.\n");
+  print("\tReturns OK - <id>/FAIL\n");
+  print("--status <id>\n");
+  print("\tid (optional)- ID of a configured receiver\n");
+  print("\t\tStatus for all receivers will be diplayed, if omitted.\n");
+  print("\tReturns the receiver status.\n");
+  print("--reset\n");
+  print("\tTurn off all receivers and re-initate all timers.\n");
+  print("\tReturns OK/FAIL\n");
+  print("--gettimer <receiverid>\n");
+  print("\treceiverid (optional) - display information for timers set for this receiver.\n");
+  print("\t\tInformation for all timers will be diplayed, if omitted.\n");
+  print("\tReturns a list of the configured timers\n");
+  print("\tID<tab>Receiver ID<tab>On time<tab>Off time<tab>Days<tab>Dim level\n");
+  print("--addtimer <receiverid> <ontime> <offtime> <daysofweek> <dimlevel>\n");
+  print("\treceiverid - ID of the receiver to set timer for.\n");
+  print("\tontime - when to activate the receiver.\n");
+  print("\tofftime - when to deactivate the receiver.\n");
+  print("\tValid formats:\n");
+  print("\t\thh:mm[Rmmm] - hour:minute +RANDOM minutes. E.g. 19:30R30 = 19:31 - 20:00\n");
+  print("\t\tSUNRISE|SUNSET[+-mmm] - Sunrise/Sunset +- minutes E.g. SUNSET-20\n");
+  print("\tdaysofweek - the days of the week the timer is active.\n");
+  print("\t\tE.g. 1234567 - all days, 567 - Fr, Sa, Su\n");
+  print("\tdimlevel - Set this level when activating the timer.\n");
+  print("\t\t0      : No dimming, turn on full.\n");
+  print("\t\t1 - 15 : Level to use\n");
+  print("\t\tSetting will be ignored for non dimmable receivers.\n");
+  print("\tAdd a new timer setting for a given receiver.\n");
+  print("\tReturns OK - id/FAIL\n");
+  print("--edittimer <timerid> <ontime> <offtime> <daysofweek> <dimlevel>\n");
+  print("\ttimerid - ID of the timer to edit.\n");
+  print("\tontime - when to activate the receiver.\n");
+  print("\tofftime - when to deactivate the receiver.\n");
+  print("\tdaysofweek - the days of the week the timer is active.\n");
+  print("\tdimlevel - Set this level when activating the timer.\n");
+  print("\tExamples, see --addtimer\n");
+  print("\tEdit the settings of an existing timer.\n");
+  print("\tReturns OK - id/FAIL\n");
+  print("--deletetimer <id>\n");
+  print("\tid - ID of a timer setting.\n");
+  print("\tDelete a timer setting.\n");
+  print("\tReturns OK/FAIL\n");
+  print("--getlog <lines>\n");
+  print("\tlines (optional)- Number of lines to display.\n");
+  print("\t\t10 lines will be returned, if omitted.\n");
+  print("\tReturns the last <lines> lines of the log.\n");
+  print("--license\n");
+  print("\tDisplay the license information.\n");
+  print("--help\n");
+  print("\tDisplay this information.\n");
+  print("\nby Fredrik Stalhammar 2008-2012\r\n");
+  print("https://github.com/Steelhammer/lightcontrol\n");
+  
+  return 1;
+}
+
+=head2 lcLicenseInfo()
+
+=over 2
+
+=item * I<parameters: none>
+
+=item * I<returns: (integer) 1>
+
+=back
+
+Displays the tool license information.
+
+=cut
+
+sub lcLicenseInfo
+{
+  print("\nLicense\n\n");
+  print("lccmd  Copyright (C) 2012  Fredrik Stalhammar\n".
+         "This program comes with ABSOLUTELY NO WARRANTY; for details see the file LICENSE.\n".
+         "This is free software, and you are welcome to redistribute it\n".
+         "under certain conditions; see the file LICENSE for details.\n\n");
+  print("The complete information is available in the file 'LICENSE', that should be included in the sw bundle.\n");
+  print("If missing, the offial package is available at https://github.com/Steelhammer/lightcontrol\n\n");
+  
+  return 1;
+}
