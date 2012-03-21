@@ -22,4 +22,4 @@ All tests have been performed using NEXA receivers.
 
 Yes, I know there might be one or two of these out there already :-)
 
-The project lcweb contains a REST API and a reference web page for interacting with the API.
+The project lcweb contains a REST API and a reference web page for interacting with the API. (https://github.com/Steelhammer/lcweb)
