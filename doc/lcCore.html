@@ -1,0 +1,389 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>lcCore.pm</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#lccore_pm">lcCore.pm</a></li>
+	<li><a href="#receiver_functions">Receiver functions</a></li>
+	<ul>
+
+		<li><a href="#getreceiversraw__"><code>GetReceiversRaw()</code></a></li>
+		<li><a href="#getreceiversbyid__"><code>GetReceiversById()</code></a></li>
+		<li><a href="#addreceiver__"><code>AddReceiver()</code></a></li>
+		<li><a href="#updatereceiver__"><code>UpdateReceiver()</code></a></li>
+		<li><a href="#deletereceiver__"><code>DeleteReceiver()</code></a></li>
+		<li><a href="#getreceiverstatus__"><code>GetReceiverStatus()</code></a></li>
+		<li><a href="#receiverexists__"><code>ReceiverExists()</code></a></li>
+		<li><a href="#resetreceiverstatus__"><code>ResetReceiverStatus()</code></a></li>
+		<li><a href="#initreceiverresettimer__"><code>InitReceiverResetTimer()</code></a></li>
+	</ul>
+
+	<li><a href="#timer_functions">Timer functions</a></li>
+	<ul>
+
+		<li><a href="#gettimers__"><code>GetTimers()</code></a></li>
+		<li><a href="#addnewtimer__"><code>AddNewTimer()</code></a></li>
+		<li><a href="#edittimer__"><code>EditTimer()</code></a></li>
+		<li><a href="#deletetimer__"><code>DeleteTimer()</code></a></li>
+		<li><a href="#gettimershedule__"><code>GetTimerShedule()</code></a></li>
+		<li><a href="#timerexists__"><code>TimerExists()</code></a></li>
+	</ul>
+
+	<li><a href="#common_functions">Common functions</a></li>
+	<ul>
+
+		<li><a href="#getlog__"><code>GetLog()</code></a></li>
+		<li><a href="#printtolog__"><code>PrintToLog()</code></a></li>
+	</ul>
+
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<pre>
+   _ _       _     _                  _             _   
+  | (_) __ _| |__ | |_ ___ ___  _ __ | |_ _ __ ___ | |  
+  | | |/ _` | '_ \| __/ __/ _ \| '_ \| __| '__/ _ \| |  
+  | | | (_| | | | | || (_| (_) | | | | |_| | | (_) | |  
+  |_|_|\__, |_| |_|\__\___\___/|_| |_|\__|_|  \___/|_|  
+       |___/</pre>
+<pre>
+  lightcontrol - Light control using the Tellstick
+  Copyright (C) 2012  Fredrik Stalhammar</pre>
+<pre>
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.</pre>
+<pre>
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.</pre>
+<pre>
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see &lt;<a href="http://www.gnu.org/licenses/&gt">http://www.gnu.org/licenses/&gt</a>;.
+    
+  Inspired by the works of <a href="http://www.telldus.se/">http://www.telldus.se/</a></pre>
+<pre>
+  https://github.com/Steelhammer/lightcontrol</pre>
+<p>
+</p>
+<hr />
+<h1><a name="lccore_pm">lcCore.pm</a></h1>
+<p>Shared functions between lccmd and lctimerd.pl</p>
+<p>
+</p>
+<hr />
+<h1><a name="receiver_functions">Receiver functions</a></h1>
+<p>Functions to manipulate the recceivers.</p>
+<p>
+</p>
+<h2><a name="getreceiversraw__"><code>GetReceiversRaw()</code></a></h2>
+<ul>
+<li><strong><a name="parameters" class="item"><em>parameters:</em></a></strong>
+
+<p>$onerec (integer) - ID of receiver to get information for.</p>
+</li>
+<li><strong><a name="receiver" class="item"><em>returns: List of receiver(s)/FAIL</em></a></strong>
+
+<pre>
+ Format:
+ ID&lt;tab&gt;Name&lt;tab&gt;House code&lt;tab&gt;Unit code&lt;tab&gt;Dimmer&lt;tab&gt;Status&lt;tab&gt;Learned&lt;new line&gt;
+ 
+ ID         : ID for the receiver
+ Name       : Name describing the receiver, e.g Kitchen - Window
+ House code : (internal) Part 1 of the auto generated code to identify the receiver HW 
+ Unit code  : (internal) Part 2 ...
+ Dimmer     : 0/1 - The receiver can be dimmed
+ Status     : Off/On/Dimmed n - 1&lt;=n&lt;=14
+ Learned    : 0/1 - The receiver is connected atleast one HW</pre>
+</li>
+</ul>
+<p>List the receiver settings. All receivers are returned if the ID parameter is 0.</p>
+<p>
+</p>
+<h2><a name="getreceiversbyid__"><code>GetReceiversById()</code></a></h2>
+<ul>
+<li><strong><a name="parameters_none" class="item"><em>parameters: none</em></a></strong>
+
+</li>
+<li><strong><a name="returns_list_of_lcreceiver_objects" class="item"><em>returns: List of lcReceiver objects</em></a></strong>
+
+</li>
+</ul>
+<p>The lcReceiver objects are placed in a hash with the reciever ID as key.</p>
+<p>
+</p>
+<h2><a name="addreceiver__"><code>AddReceiver()</code></a></h2>
+<ul>
+<li><strong><a name="parameters2" class="item"><em>parameters:</em></a></strong>
+
+<p>$receiverName (string) - Descriptive name for the receiver, e.g. Kitchen - Window</p>
+<p>$isDimmer (0/1) - The receiver can be dimmed</p>
+</li>
+<li><strong><a name="returns_integer_0_id_of_the_created_receiver" class="item"><em>returns: (integer) 0/ID of the created receiver</em></a></strong>
+
+<pre>
+ A non zero return value means that the receiver was created successfully.</pre>
+</li>
+</ul>
+<p>Creating new settings for a receiver. 
+The name of the receiver must be unique. 
+The HW parameters are automatically generated from the seed in the config file (lightcontrol.conf).</p>
+<p>
+</p>
+<h2><a name="updatereceiver__"><code>UpdateReceiver()</code></a></h2>
+<ul>
+<li><strong><a name="parameters3" class="item"><em>parameters:</em></a></strong>
+
+<p>$id (integer)- ID of the receiver to update</p>
+<p>$receiverName (string) - Descriptive name for the receiver, e.g. Kitchen - Window</p>
+<p>$isDimmer (0/1) - The receiver can be dimmed</p>
+</li>
+<li><strong><a name="returns_integer_0_id_of_the_updated_receiver" class="item"><em>returns: (integer) 0/ID of the updated receiver</em></a></strong>
+
+<pre>
+ A non zero return value means that the receiver was updated successfully.</pre>
+</li>
+</ul>
+<p>Updating the settings for a receiver.
+The name of the receiver must be unique. 
+The HW parameters cannot be changed.</p>
+<p>
+</p>
+<h2><a name="deletereceiver__"><code>DeleteReceiver()</code></a></h2>
+<ul>
+<li><strong><a name="parameters4" class="item"><em>parameters:</em></a></strong>
+
+<p>$id (integer) - ID of the receiver to delete</p>
+</li>
+<li><strong><a name="returns_integer_0_id_of_the_deleted_receiver" class="item"><em>returns: (integer) 0/ID of the deleted receiver</em></a></strong>
+
+</li>
+</ul>
+<p>Deleting a receiver.</p>
+<p>
+</p>
+<h2><a name="getreceiverstatus__"><code>GetReceiverStatus()</code></a></h2>
+<ul>
+<li><strong><a name="parameters5" class="item"><em>parameters:</em></a></strong>
+
+<p>$onerec (integer) - ID of receiver to get information for.</p>
+</li>
+<li><strong><a name="returns_string_list_of_receiver_status" class="item"><em>returns: (string) List of receiver status</em></a></strong>
+
+<pre>
+ Format:
+ ID&lt;tab&gt;Status&lt;new line&gt;
+ 
+ ID         : ID for the receiver
+ Status     : Off/On/Dimmed n - 1&lt;=n&lt;=14</pre>
+</li>
+</ul>
+<p>List the receiver status. All receivers status are returned if the ID parameter is 0.</p>
+<p>
+</p>
+<h2><a name="receiverexists__"><code>ReceiverExists()</code></a></h2>
+<ul>
+<li><strong><a name="parameters6" class="item"><em>parameters:</em></a></strong>
+
+<p>$id (integer) - ID of the receiver to check</p>
+</li>
+<li><strong><a name="returns_0_1" class="item"><em>returns: 0/1</em></a></strong>
+
+</li>
+</ul>
+<p>Check if a receiver with id $id exists in the database.</p>
+<p>
+</p>
+<h2><a name="resetreceiverstatus__"><code>ResetReceiverStatus()</code></a></h2>
+<ul>
+<li><strong><a name="parameters_none2" class="item"><em>parameters: none</em></a></strong>
+
+</li>
+<li><strong><a name="returns_0_12" class="item"><em>returns: 0/1</em></a></strong>
+
+</li>
+</ul>
+<p>Turns off all receivers and re-initiate the timers.</p>
+<p>I.e. sync up the status of all receivers, the system cannot track if a manual remote is used.</p>
+<p>
+</p>
+<h2><a name="initreceiverresettimer__"><code>InitReceiverResetTimer()</code></a></h2>
+<ul>
+<li><strong><a name="parameters_none3" class="item"><em>parameters: none</em></a></strong>
+
+</li>
+<li><strong><a name="returns_string_hh_mm_time_stamp" class="item"><em>returns: (string ) hh:mm time stamp</em></a></strong>
+
+</li>
+</ul>
+<p>Sets the timer for the reset fuctionality based of the RESETTIME setting in the config file. 
+This functionality has the added benefit of ensuring that no light are left on by misstake. 
+If the timer is set to a time just after you normally leave home in the morning, you can be sure all lights are off 
+(unless set by a timer).</p>
+<p>
+</p>
+<hr />
+<h1><a name="timer_functions">Timer functions</a></h1>
+<p>Functions to manipulate the timer settings.</p>
+<p>
+</p>
+<h2><a name="gettimers__"><code>GetTimers()</code></a></h2>
+<ul>
+<li><strong><a name="parameters7" class="item"><em>parameters:</em></a></strong>
+
+<p>$onerec (integer) - ID of receiver to get timer information for.</p>
+</li>
+<li><strong><a name="timer" class="item"><em>returns: (string) List of timer(s)/FAIL</em></a></strong>
+
+<pre>
+ Format:
+ ID&lt;tab&gt;Receiver ID&lt;tab&gt;On time&lt;tab&gt;Off time&lt;tab&gt;Days&lt;tab&gt;Dim level&lt;new line&gt;
+ 
+ ID          : ID for the timer
+ Receiver ID : ID of the receiver connected to the timer
+ On Time     : Time to turn on the receiver
+               hh:mm[Rmmm] - hour:minute +RANDOM minutes. E.g. 19:30R30 = 19:31 - 20:00
+               SUNRISE|SUNSET[+-mmm] - Sunrise/Sunset +- minutes E.g. SUNSET-20
+ Off Time    : Time to turn off the receiver
+               See 'On Time'
+ Days        : Days of the week the timer is active
+               E.g. 1234567 - all days, 567 - Fr, Sa, Su
+ Dim level   : Dimmer level to use when activating the timer 
+               0      : No dimming, turn on full.
+               1 - 15 : Level to use</pre>
+</li>
+</ul>
+<p>List the timer settings. All timers are returned if the Receiver ID parameter is 0.</p>
+<p>
+</p>
+<h2><a name="addnewtimer__"><code>AddNewTimer()</code></a></h2>
+<ul>
+<li><strong><a name="parameters8" class="item"><em>parameters:</em></a></strong>
+
+<p>$receiverId (integer) - ID of the receiver for which to set the timer</p>
+<p>$onTime (string) - Time to turn on receiver</p>
+<p>$offTime (string) - Time to turn off the receiver</p>
+<p>$repDays (integer) - Days of the week to use the timer</p>
+<p>$dimLevel (integer) - Use this dimmer level when activating the receiver</p>
+</li>
+<li><strong><a name="returns_integer_0_id_of_the_created_timer_setting" class="item"><em>returns: (integer) 0/ID of the created timer setting</em></a></strong>
+
+</li>
+</ul>
+<p>Add a new timer to the requested receiver. 
+$dimlevel will we set to 0 for non dimmable receivers. 
+See <a href="#gettimers__">GetTimers()</a> for information about the formats for the parameters.</p>
+<p>
+</p>
+<h2><a name="edittimer__"><code>EditTimer()</code></a></h2>
+<ul>
+<li><strong><a name="parameters9" class="item"><em>parameters:</em></a></strong>
+
+<p>$timerId (integer) - ID of the timer to update</p>
+<p>$onTime (string) - Time to turn on receiver</p>
+<p>$offTime (string) - Time to turn off the receiver</p>
+<p>$repDays (integer) - Days of the week to use the timer</p>
+<p>$dimLevel (integer) - Use this dimmer level when activating the receiver</p>
+</li>
+<li><strong><a name="returns_integer_0_id_of_the_updated_timer_setting" class="item"><em>returns: (integer) 0/ID of the updated timer setting</em></a></strong>
+
+</li>
+</ul>
+<p>Edit the settings for a timer
+The receiver affected by the setting cannot be changed. 
+$dimlevel will we set to 0 for non dimmable receivers. 
+See <a href="#gettimers__">GetTimers()</a> for information about the formats for the parameters.</p>
+<p>
+</p>
+<h2><a name="deletetimer__"><code>DeleteTimer()</code></a></h2>
+<ul>
+<li><strong><a name="parameters10" class="item"><em>parameters:</em></a></strong>
+
+<p>$id (integer) - ID of the timer to delete</p>
+</li>
+<li><strong><a name="returns_integer_0_id_of_the_deleted_timer" class="item"><em>returns: (integer) 0/ID of the deleted timer</em></a></strong>
+
+</li>
+</ul>
+<p>Deleting a timer.</p>
+<p>
+</p>
+<h2><a name="gettimershedule__"><code>GetTimerShedule()</code></a></h2>
+<ul>
+<li><strong><a name="parameters_none" class="item"><em>parameters: None</em></a></strong>
+
+</li>
+<li><strong><a name="returns_list_of_lcscheduleentry_objects" class="item"><em>returns: list of lcScheduleEntry objects</em></a></strong>
+
+</li>
+</ul>
+<p>Read the timer settings from the database and generate a list of objects to represent them.</p>
+<p>
+</p>
+<h2><a name="timerexists__"><code>TimerExists()</code></a></h2>
+<ul>
+<li><strong><a name="parameters11" class="item"><em>parameters:</em></a></strong>
+
+<p>$id (integer) - ID of the timer to check</p>
+</li>
+<li><strong><a name="returns_0_13" class="item"><em>returns: 0/1</em></a></strong>
+
+</li>
+</ul>
+<p>Check if a timer with id $id exists in the database.</p>
+<p>
+</p>
+<hr />
+<h1><a name="common_functions">Common functions</a></h1>
+<p>Functions perform common and supporting tasks.</p>
+<p>
+</p>
+<h2><a name="getlog__"><code>GetLog()</code></a></h2>
+<ul>
+<li><strong><a name="parameters12" class="item"><em>parameters:</em></a></strong>
+
+<p>$nbrEntries (integer) - Number of log lines to display</p>
+</li>
+<li><strong><a name="returns_the_last_nbrentries_lines_of_the_log" class="item"><em>returns: The last $nbrEntries lines of the log</em></a></strong>
+
+</li>
+</ul>
+<p>Diplays the log as plain text. 
+The log is presented with last entry first. 
+If $nbrEntries = 0 the last 10 lines will be returned.</p>
+<p>
+</p>
+<h2><a name="printtolog__"><code>PrintToLog()</code></a></h2>
+<ul>
+<li><strong><a name="parameters13" class="item"><em>parameters:</em></a></strong>
+
+<p>$logStr (string) - Text to print to the log</p>
+</li>
+<li><strong><a name="returns_0_14" class="item"><em>returns: 0/1</em></a></strong>
+
+</li>
+</ul>
+<p>Print an entry to the application log. 
+Time stamp and new line will be added automatically.</p>
+
+</body>
+
+</html>

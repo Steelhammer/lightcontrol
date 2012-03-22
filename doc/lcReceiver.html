@@ -1,0 +1,347 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>lcReceiver.pm</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#lcreceiver_pm">lcReceiver.pm</a></li>
+	<li><a href="#member_functions">Member functions</a></li>
+	<ul>
+
+		<li><a href="#new__"><code>new()</code></a></li>
+		<li><a href="#receivername__"><code>ReceiverName()</code></a></li>
+		<li><a href="#receiverid__"><code>ReceiverId()</code></a></li>
+		<li><a href="#receiverhouse__"><code>ReceiverHouse()</code></a></li>
+		<li><a href="#receivercode__"><code>ReceiverCode()</code></a></li>
+		<li><a href="#receiverisdimmer__"><code>ReceiverIsDimmer()</code></a></li>
+		<li><a href="#receiveractivate__"><code>ReceiverActivate()</code></a></li>
+		<li><a href="#receiverdeactivate__"><code>ReceiverDeactivate()</code></a></li>
+		<li><a href="#receiverdim__"><code>ReceiverDim()</code></a></li>
+		<li><a href="#receiverlearn__"><code>ReceiverLearn()</code></a></li>
+		<li><a href="#_compare_overload__"><code>_compare_overload()</code></a></li>
+	</ul>
+
+	<li><a href="#support_functions">Support functions</a></li>
+	<ul>
+
+		<li><a href="#turnon__"><code>turnOn()</code></a></li>
+		<li><a href="#turnoff__"><code>turnOff()</code></a></li>
+		<li><a href="#dim__"><code>dim()</code></a></li>
+		<li><a href="#learn__"><code>learn()</code></a></li>
+		<li><a href="#createnexaselflearncommand__"><code>CreateNEXASelfLearnCommand()</code></a></li>
+		<li><a href="#sendcommand__"><code>SendCommand()</code></a></li>
+	</ul>
+
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<pre>
+   _ _       _     _                  _             _   
+  | (_) __ _| |__ | |_ ___ ___  _ __ | |_ _ __ ___ | |  
+  | | |/ _` | '_ \| __/ __/ _ \| '_ \| __| '__/ _ \| |  
+  | | | (_| | | | | || (_| (_) | | | | |_| | | (_) | |  
+  |_|_|\__, |_| |_|\__\___\___/|_| |_|\__|_|  \___/|_|  
+       |___/</pre>
+<pre>
+  lightcontrol - Light control using the Tellstick
+  Copyright (C) 2012  Fredrik Stalhammar</pre>
+<pre>
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.</pre>
+<pre>
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.</pre>
+<pre>
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see &lt;<a href="http://www.gnu.org/licenses/&gt">http://www.gnu.org/licenses/&gt</a>;.
+    
+  Inspired by the works of <a href="http://www.telldus.se/">http://www.telldus.se/</a></pre>
+<pre>
+  https://github.com/Steelhammer/lightcontrol</pre>
+<p>
+</p>
+<hr />
+<h1><a name="lcreceiver_pm">lcReceiver.pm</a></h1>
+<p>Object to represent the receiver.</p>
+<p><em>Synopsis</em></p>
+<pre>
+ Create receiver object
+ my $receiver = new lcReceiver(_id=&gt;123, _name=&gt;'Some Name', _house=&gt;123456, _code=&gt;7, _dimmer=&gt;1);
+ 
+ Handle the receiver
+ 
+ Turn the receiver on
+ $receiver-&gt;ReceiverActivate();
+ 
+ Turn the receiver off
+ $receiver-&gt;ReceiverDeactivate();
+ 
+ Dim the receiver
+ $receiver-&gt;ReceiverDim(7);
+ 
+ Register the receiver HW
+ $receiver-&gt;ReceiverLearn();</pre>
+<p>
+</p>
+<hr />
+<h1><a name="member_functions">Member functions</a></h1>
+<p>Functions to access the receiver object.</p>
+<p>
+</p>
+<h2><a name="new__"><code>new()</code></a></h2>
+<ul>
+<li><strong><a name="parameters" class="item"><em>parameters:</em></a></strong>
+
+<p>_id (integer) - ID of the receiver</p>
+<p>_name (string) - Recevier name</p>
+<p>_house (integer) - House code</p>
+<p>_code (integer) - Unit code</p>
+<p>_dimmer (0/1) - Is the receiver a dimmer</p>
+</li>
+<li><strong><a name="returns_undef_lcreceiver_object" class="item"><em>returns: undef/lcReceiver object</em></a></strong>
+
+</li>
+</ul>
+<p>Constructor to create the lcReceiver object.</p>
+<p>
+</p>
+<h2><a name="receivername__"><code>ReceiverName()</code></a></h2>
+<ul>
+<li><strong><a name="parameters2" class="item"><em>parameters:</em></a></strong>
+
+<p>$name (string) - Optional, Change the receiver name to this.</p>
+</li>
+<li><strong><a name="returns_string_receiver_name" class="item"><em>returns: (string) Receiver name</em></a></strong>
+
+</li>
+</ul>
+<p>Get/Set the receiver name. If the name parameter is set, the name is updated. 
+In either case the name of the recevier is returned.</p>
+<p>
+</p>
+<h2><a name="receiverid__"><code>ReceiverId()</code></a></h2>
+<ul>
+<li><strong><a name="parameters_none" class="item"><em>parameters: none</em></a></strong>
+
+</li>
+<li><strong><a name="returns_integer_receiver_id" class="item"><em>returns: (integer) receiver id</em></a></strong>
+
+</li>
+</ul>
+<p>Get the receiver id. There is no in parameter as the receiver id should not be changed.</p>
+<p>
+</p>
+<h2><a name="receiverhouse__"><code>ReceiverHouse()</code></a></h2>
+<ul>
+<li><strong><a name="parameters_none2" class="item"><em>parameters: none</em></a></strong>
+
+</li>
+<li><strong><a name="returns_integer_receiver_house_id" class="item"><em>returns: (integer) receiver house id</em></a></strong>
+
+</li>
+</ul>
+<p>Get the receiver house id. There is no in parameter as the receiver house id should not be changed.</p>
+<p>
+</p>
+<h2><a name="receivercode__"><code>ReceiverCode()</code></a></h2>
+<ul>
+<li><strong><a name="parameters_none3" class="item"><em>parameters: none</em></a></strong>
+
+</li>
+<li><strong><a name="returns_integer_receiver_unit_id" class="item"><em>returns: (integer) receiver unit id</em></a></strong>
+
+</li>
+</ul>
+<p>Get the receiver unit id. There is no in parameter as the receiver unit id should not be changed.</p>
+<p>
+</p>
+<h2><a name="receiverisdimmer__"><code>ReceiverIsDimmer()</code></a></h2>
+<ul>
+<li><strong><a name="parameters3" class="item"><em>parameters:</em></a></strong>
+
+<p>$isDimmer (0/1) - Optional, receiver is dimmer.</p>
+</li>
+<li><strong><a name="returns_0_1" class="item"><em>returns: (0/1)</em></a></strong>
+
+</li>
+</ul>
+<p>Get/Set the receiver dimmer status. 
+If the $isDimmer parameter is set, the dimmer status is updated. 
+In either case the dimmer status is returned.</p>
+<p>
+</p>
+<h2><a name="receiveractivate__"><code>ReceiverActivate()</code></a></h2>
+<ul>
+<li><strong><a name="parameters_none4" class="item"><em>parameters: none</em></a></strong>
+
+</li>
+<li><strong><a name="returns_0_12" class="item"><em>returns: (0/1)</em></a></strong>
+
+</li>
+</ul>
+<p>Activate the receiver. If the receiver is a dimmer, this command will set the dimmer to max.</p>
+<p>
+</p>
+<h2><a name="receiverdeactivate__"><code>ReceiverDeactivate()</code></a></h2>
+<ul>
+<li><strong><a name="parameters_none5" class="item"><em>parameters: none</em></a></strong>
+
+</li>
+<li><strong><a name="returns_0_13" class="item"><em>returns: (0/1)</em></a></strong>
+
+</li>
+</ul>
+<p>Deactivate the receiver.</p>
+<p>
+</p>
+<h2><a name="receiverdim__"><code>ReceiverDim()</code></a></h2>
+<ul>
+<li><strong><a name="parameters4" class="item"><em>parameters:</em></a></strong>
+
+<p>$level (integer) - Dimming level</p>
+</li>
+<li><strong><a name="returns_0_14" class="item"><em>returns: (0/1)</em></a></strong>
+
+</li>
+</ul>
+<p>Set the dimmer level, 0-15. 
+No action will be taken if the receiver is not a dimmer.</p>
+<p>
+</p>
+<h2><a name="receiverlearn__"><code>ReceiverLearn()</code></a></h2>
+<ul>
+<li><strong><a name="parameters_none6" class="item"><em>parameters: none</em></a></strong>
+
+</li>
+<li><strong><a name="returns_0_15" class="item"><em>returns: (0/1)</em></a></strong>
+
+</li>
+</ul>
+<p>Send the learn command to connect to the receiver HW.</p>
+<p>
+</p>
+<h2><a name="_compare_overload__"><code>_compare_overload()</code></a></h2>
+<p>Sort receivers according to receiver name.</p>
+<p>
+</p>
+<hr />
+<h1><a name="support_functions">Support functions</a></h1>
+<p>Functions to perform tasks for the lcReceiver object.</p>
+<p>
+</p>
+<h2><a name="turnon__"><code>turnOn()</code></a></h2>
+<ul>
+<li><strong><a name="parameters5" class="item"><em>parameters:</em></a></strong>
+
+<p>$house (integer) - House code</p>
+<p>$code (integer) - Unit code</p>
+<p>$isDimmer (0/1) - Is the receiver a dimmer</p>
+<p>$id (integer) - ID of the receiver</p>
+</li>
+<li><strong><a name="returns_0_16" class="item"><em>returns: 0/1</em></a></strong>
+
+</li>
+</ul>
+<p>Generate and send the Turn on command. 
+If the receiver is a dimmer, call <a href="#dim__">dim()</a> to set max dim level</p>
+<p>
+</p>
+<h2><a name="turnoff__"><code>turnOff()</code></a></h2>
+<ul>
+<li><strong><a name="parameters6" class="item"><em>parameters:</em></a></strong>
+
+<p>$house (integer) - House code</p>
+<p>$code (integer) - Unit code</p>
+<p>$id (integer) - ID of the receiver</p>
+</li>
+<li><strong><a name="returns_0_17" class="item"><em>returns: 0/1</em></a></strong>
+
+</li>
+</ul>
+<p>Generate and send the Turn off command.</p>
+<p>
+</p>
+<h2><a name="dim__"><code>dim()</code></a></h2>
+<ul>
+<li><strong><a name="parameters7" class="item"><em>parameters:</em></a></strong>
+
+<p>$house (integer) - House code</p>
+<p>$code (integer) - Unit code</p>
+<p>$level (integer) - Dimming level</p>
+<p>$id (integer) - ID of the receiver</p>
+</li>
+<li><strong><a name="returns_0_18" class="item"><em>returns: 0/1</em></a></strong>
+
+</li>
+</ul>
+<p>Generate and send the Dimming command. 
+If $level == 0 call <a href="#turnoff__">turnOff()</a> to deactivate the receiver.
+If $level == 15 the receiver status will be set to 'On'.</p>
+<p>
+</p>
+<h2><a name="learn__"><code>learn()</code></a></h2>
+<ul>
+<li><strong><a name="parameters8" class="item"><em>parameters:</em></a></strong>
+
+<p>$house (integer) - House code</p>
+<p>$code (integer) - Unit code</p>
+<p>$id (integer) - ID of the receiver</p>
+</li>
+<li><strong><a name="returns_0_19" class="item"><em>returns: 0/1</em></a></strong>
+
+</li>
+</ul>
+<p>Generate and send the learn commad.</p>
+<p>
+</p>
+<h2><a name="createnexaselflearncommand__"><code>CreateNEXASelfLearnCommand()</code></a></h2>
+<ul>
+<li><strong><a name="parameters9" class="item"><em>parameters:</em></a></strong>
+
+<p>$house (integer) - House code</p>
+<p>$code (integer) - Unit code</p>
+<p>$dim (integer) - Dimming command requested</p>
+<p>$level (integer) - Dimming level</p>
+</li>
+<li><strong><a name="returns_string_nexa_command_string" class="item"><em>returns: (string) NEXA command string</em></a></strong>
+
+</li>
+</ul>
+<p>Generate the command string based on the input.
+This function is used by <a href="#turnon__">turnOn()</a>, <a href="#turnoff__">turnOff()</a>, <a href="#dim__">dim()</a> and <a href="#learn__">learn()</a>.</p>
+<p>
+</p>
+<h2><a name="sendcommand__"><code>SendCommand()</code></a></h2>
+<ul>
+<li><strong><a name="parameters10" class="item"><em>parameters:</em></a></strong>
+
+<p>$id (string) - Device command string</p>
+</li>
+<li><strong><a name="returns_integer_0_1" class="item"><em>returns: (integer) 0/1</em></a></strong>
+
+</li>
+</ul>
+<p>Write the device command string to the tellstick.</p>
+
+</body>
+
+</html>

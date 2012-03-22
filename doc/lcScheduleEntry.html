@@ -1,0 +1,212 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>lcScheduleEntry.pm</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#lcscheduleentry_pm">lcScheduleEntry.pm</a></li>
+	<li><a href="#member_functions">Member functions</a></li>
+	<ul>
+
+		<li><a href="#new__"><code>new()</code></a></li>
+		<li><a href="#init__"><code>Init()</code></a></li>
+		<li><a href="#isactiontimedue__"><code>IsActionTimeDue()</code></a></li>
+		<li><a href="#getreceiverid__"><code>GetReceiverId()</code></a></li>
+		<li><a href="#getid__"><code>GetId()</code></a></li>
+		<li><a href="#getnextevent__"><code>GetNextEvent()</code></a></li>
+		<li><a href="#geteventtype__"><code>GetEventType()</code></a></li>
+		<li><a href="#getdimlevel__"><code>GetDimLevel()</code></a></li>
+		<li><a href="#getactualtime__"><code>GetActualTime()</code></a></li>
+		<li><a href="#_compare_overload__"><code>_compare_overload()</code></a></li>
+	</ul>
+
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<pre>
+   _ _       _     _                  _             _   
+  | (_) __ _| |__ | |_ ___ ___  _ __ | |_ _ __ ___ | |  
+  | | |/ _` | '_ \| __/ __/ _ \| '_ \| __| '__/ _ \| |  
+  | | | (_| | | | | || (_| (_) | | | | |_| | | (_) | |  
+  |_|_|\__, |_| |_|\__\___\___/|_| |_|\__|_|  \___/|_|  
+       |___/</pre>
+<pre>
+  lightcontrol - Light control using the Tellstick
+  Copyright (C) 2012  Fredrik Stalhammar</pre>
+<pre>
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.</pre>
+<pre>
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.</pre>
+<pre>
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see &lt;<a href="http://www.gnu.org/licenses/&gt">http://www.gnu.org/licenses/&gt</a>;.
+    
+  Inspired by the works of <a href="http://www.telldus.se/">http://www.telldus.se/</a></pre>
+<pre>
+  https://github.com/Steelhammer/lightcontrol</pre>
+<p>
+</p>
+<hr />
+<h1><a name="lcscheduleentry_pm">lcScheduleEntry.pm</a></h1>
+<p>Object to represent a timer setting in the timer daemon.</p>
+<p><em>Synopsis</em></p>
+<pre>
+ Create Schedule Entry object
+ my $entry = new lcScheduleEntry(_id =&gt; 5, 
+                                 _recId =&gt; 2,
+                                 _onTime =&gt; 'SUNSET',
+                                 _offTime =&gt; '23:00R30',
+                                 _repeatPattern =&gt; 56,
+                                 _dimLevel =&gt; 0
+                                );</pre>
+<p>
+</p>
+<hr />
+<h1><a name="member_functions">Member functions</a></h1>
+<p>Functions to access the schedule object.</p>
+<p>
+</p>
+<h2><a name="new__"><code>new()</code></a></h2>
+<ul>
+<li><strong><a name="parameters" class="item"><em>parameters:</em></a></strong>
+
+<p>_id (integer) - ID of the timer</p>
+<p>_recId (integer) - ID of the receiver affected</p>
+<p>_onTime (string) - Time when the receiver should turn on</p>
+<p>_onTime (string) - Time when the receiver should turn off</p>
+<p>_repeatPattern (integer) - Days of the week to use the timer</p>
+<p>_dimLevel (integer) - Dimmer level to use when activating the timer</p>
+</li>
+<li><strong><a name="returns_undef_lcscheduleentry_object" class="item"><em>returns: undef/lcScheduleEntry object</em></a></strong>
+
+</li>
+</ul>
+<p>Constructor to create the lcScheduleEntry object.</p>
+For valid parameter formats see <a href="lcCore.html#gettimers__" >GetTimers()</a><p>
+</p>
+<h2><a name="init__"><code>Init()</code></a></h2>
+<ul>
+<li><strong><a name="parameters_none" class="item"><em>parameters: none</em></a></strong>
+
+</li>
+<li><strong><a name="returns_0_1" class="item"><em>returns: (0/1)</em></a></strong>
+
+</li>
+</ul>
+<p>Uses the input to the constructor <a href="#new__">new()</a> to initiate all parts of the object.</p>
+<p>
+</p>
+<h2><a name="isactiontimedue__"><code>IsActionTimeDue()</code></a></h2>
+<ul>
+<li><strong><a name="parameters2" class="item"><em>parameters:</em></a></strong>
+
+<p>$compTime (DateTime object) - Time stamp to compare</p>
+</li>
+<li><strong><a name="returns_0_12" class="item"><em>returns: (0/1)</em></a></strong>
+
+</li>
+</ul>
+<p>Check if the timer is due. 
+Current time is typically used for $compTime.</p>
+<p>
+</p>
+<h2><a name="getreceiverid__"><code>GetReceiverId()</code></a></h2>
+<ul>
+<li><strong><a name="parameters_none2" class="item"><em>parameters: none</em></a></strong>
+
+</li>
+<li><strong><a name="returns_integer_receiver_id" class="item"><em>returns: (integer) receiver ID</em></a></strong>
+
+</li>
+</ul>
+<p>Get the ID of the receiver affected by the timer setting.</p>
+<p>
+</p>
+<h2><a name="getid__"><code>GetId()</code></a></h2>
+<ul>
+<li><strong><a name="parameters_none3" class="item"><em>parameters: none</em></a></strong>
+
+</li>
+<li><strong><a name="returns_integer_timer_id" class="item"><em>returns: (integer) timer ID</em></a></strong>
+
+</li>
+</ul>
+<p>Get the ID of the timer setting.</p>
+<p>
+</p>
+<h2><a name="getnextevent__"><code>GetNextEvent()</code></a></h2>
+<ul>
+<li><strong><a name="parameters_none4" class="item"><em>parameters: none</em></a></strong>
+
+</li>
+<li><strong><a name="returns_1" class="item"><em>returns: 1</em></a></strong>
+
+</li>
+</ul>
+<p>Get next action time for the timer setting, based of the state of the object.</p>
+<p>
+</p>
+<h2><a name="geteventtype__"><code>GetEventType()</code></a></h2>
+<ul>
+<li><strong><a name="parameters_none5" class="item"><em>parameters: none</em></a></strong>
+
+</li>
+<li><strong><a name="returns_string_on_off" class="item"><em>returns: (string) ON/OFF</em></a></strong>
+
+</li>
+</ul>
+<p>Get the comming event for the timmer setting.</p>
+<p>
+</p>
+<h2><a name="getdimlevel__"><code>GetDimLevel()</code></a></h2>
+<ul>
+<li><strong><a name="parameters_none6" class="item"><em>parameters: none</em></a></strong>
+
+</li>
+<li><strong><a name="returns_integer_dimmer_level" class="item"><em>returns: (integer) dimmer level</em></a></strong>
+
+</li>
+</ul>
+<p>Get the dimmer level to use for the ON action.</p>
+<p>
+</p>
+<h2><a name="getactualtime__"><code>GetActualTime()</code></a></h2>
+<ul>
+<li><strong><a name="parameters3" class="item"><em>parameters:</em></a></strong>
+
+<p>$timeStr (string) - Time stamp</p>
+</li>
+<li><strong><a name="returns_string_absolute_time_stamp" class="item"><em>returns: (string) absolute time stamp</em></a></strong>
+
+</li>
+</ul>
+Takes the time stamp according to <a href="lcCore.html#gettimers__" >GetTimers()</a> and
+translate into a hh:mm time stamp<p>
+</p>
+<h2><a name="_compare_overload__"><code>_compare_overload()</code></a></h2>
+<p>Sort receivers according to time for next action.</p>
+
+</body>
+
+</html>

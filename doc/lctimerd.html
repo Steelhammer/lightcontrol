@@ -1,0 +1,108 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>lctimerd.pl</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#lctimerd_pl">lctimerd.pl</a></li>
+	<ul>
+
+		<li><a href="#shared_variable">Shared variable</a></li>
+		<li><a href="#main_timer_loop">Main timer loop</a></li>
+		<li><a href="#timertakeaction__"><code>TimerTakeAction()</code></a></li>
+		<li><a href="#exittimerloop__"><code>ExitTimerLoop()</code></a></li>
+	</ul>
+
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<pre>
+   _ _       _     _                  _             _   
+  | (_) __ _| |__ | |_ ___ ___  _ __ | |_ _ __ ___ | |  
+  | | |/ _` | '_ \| __/ __/ _ \| '_ \| __| '__/ _ \| |  
+  | | | (_| | | | | || (_| (_) | | | | |_| | | (_) | |  
+  |_|_|\__, |_| |_|\__\___\___/|_| |_|\__|_|  \___/|_|  
+       |___/</pre>
+<pre>
+  lightcontrol - Light control using the Tellstick
+  Copyright (C) 2012  Fredrik Stalhammar</pre>
+<pre>
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.</pre>
+<pre>
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.</pre>
+<pre>
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see &lt;<a href="http://www.gnu.org/licenses/&gt">http://www.gnu.org/licenses/&gt</a>;.
+    
+  Inspired by the works of <a href="http://www.telldus.se/">http://www.telldus.se/</a></pre>
+<pre>
+  https://github.com/Steelhammer/lightcontrol</pre>
+<p>
+</p>
+<hr />
+<h1><a name="lctimerd_pl">lctimerd.pl</a></h1>
+<p>Timer daemon for the light controller.</p>
+<p>
+</p>
+<h2><a name="shared_variable">Shared variable</a></h2>
+<p>The shared variable is used to communicate with lccmd. 
+The key is set in the configuration file, SHAREDKEY. 
+Write 'Update' to this variable when changing receivers or timers. 
+This will cause the timer daemon to re-read the configuration.</p>
+<p>
+</p>
+<h2><a name="main_timer_loop">Main timer loop</a></h2>
+<p>Checking the schedule item list, over and over...</p>
+<p>
+</p>
+<h2><a name="timertakeaction__"><code>TimerTakeAction()</code></a></h2>
+<ul>
+<li><strong><a name="parameters" class="item"><em>parameters:</em></a></strong>
+
+<p>$curItem (lcScheduleEntry object) - Object that need action</p>
+</li>
+<li><strong><a name="returns_integer_1" class="item"><em>returns: (integer) 1</em></a></strong>
+
+</li>
+</ul>
+<p>Called when a timer has reached the action time. 
+The action to take is determined by the state of the object. 
+A lcScheduleEntry object always contain an 'On' AND an 'Off' action. 
+The 'On' action can produce a dim command, if the dimlevel &gt; 0 and the affected receiver is a dimmer.</p>
+<p>
+</p>
+<h2><a name="exittimerloop__"><code>ExitTimerLoop()</code></a></h2>
+<ul>
+<li><strong><a name="parameters_none" class="item"><em>parameters: none</em></a></strong>
+
+</li>
+<li><strong><a name="returns_n_a" class="item"><em>returns: N/A</em></a></strong>
+
+</li>
+</ul>
+<p>Kills the application, called when Ctrl-c is sent.</p>
+
+</body>
+
+</html>

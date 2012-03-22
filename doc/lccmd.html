@@ -1,0 +1,190 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>lccmd</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#lccmd">lccmd</a></li>
+	<ul>
+
+		<li><a href="#lccmdusage__"><code>lccmdUsage()</code></a></li>
+		<li><a href="#lclicenseinfo__"><code>lcLicenseInfo()</code></a></li>
+	</ul>
+
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<pre>
+   _ _       _     _                  _             _   
+  | (_) __ _| |__ | |_ ___ ___  _ __ | |_ _ __ ___ | |  
+  | | |/ _` | '_ \| __/ __/ _ \| '_ \| __| '__/ _ \| |  
+  | | | (_| | | | | || (_| (_) | | | | |_| | | (_) | |  
+  |_|_|\__, |_| |_|\__\___\___/|_| |_|\__|_|  \___/|_|  
+       |___/</pre>
+<pre>
+  lightcontrol - Light control using the Tellstick
+  Copyright (C) 2012  Fredrik Stalhammar</pre>
+<pre>
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.</pre>
+<pre>
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.</pre>
+<pre>
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see &lt;<a href="http://www.gnu.org/licenses/&gt">http://www.gnu.org/licenses/&gt</a>;.
+    
+  Inspired by the works of <a href="http://www.telldus.se/">http://www.telldus.se/</a></pre>
+<pre>
+  https://github.com/Steelhammer/lightcontrol</pre>
+<p>
+</p>
+<hr />
+<h1><a name="lccmd">lccmd</a></h1>
+<p>Command line tool for the light controller.</p>
+<p>The description of the lccmd options is available through the tool help.</p>
+<pre>
+ lccmd --help
+ 
+ lccmd version: 2.0.0
+ 
+ Usage: lccmd --&lt;option&gt; &lt;argument(s)&gt;
+ 
+ --on &lt;id&gt;
+        id - id of the receiver to handle
+        Activate the receiver with id &lt;id&gt;
+        Returns OK - &lt;id&gt;/FAIL
+ --off &lt;id&gt;
+        id - id of the receiver to handle
+        Deactivate the receiver with id &lt;id&gt;
+        Returns OK - &lt;id&gt;/FAIL
+ --dim &lt;id&gt; &lt;level&gt;
+        id - id of the receiver to handle
+        level - dim level, 0&lt;=level&lt;=15
+        Dim the receiver with id &lt;id&gt; to level &lt;level&gt;
+        Returns OK - &lt;id&gt;/FAIL
+ --learn &lt;id&gt;
+        id - id of the receiver to handle
+        Learn the receiver with id &lt;id&gt;
+        Requires an existing receiver, see '--addreceiver'
+        Returns OK - &lt;id&gt;/FAIL
+ --addreceiver &lt;name&gt; &lt;isdimmer&gt;
+        name - Description of the receiver, e.g. Kitchen - Window
+        isdimmer -
+                1 - Receiver is a dimmer
+                0 - Receiver is not a dimmer
+        The receiver will be assigned an ID
+        Returns OK - &lt;id&gt;/FAIL
+ --getreceiver &lt;id&gt;
+        id (optional) - display information for this receiver.
+    Information for all receivers will be diplayed, if omitted.
+        Returns a list of the configured receivers
+        ID&lt;tab&gt;Name&lt;tab&gt;House code&lt;tab&gt;Unit code&lt;tab&gt;Dimmer&lt;tab&gt;Status&lt;tab&gt;Learned
+ --editreceiver &lt;id&gt; &lt;name&gt; &lt;isdimmer&gt;
+        id - ID of a configured receiver
+        name - Description of the receiver, e.g. Kitchen - Window
+        isdimmer - Hardware ID of the receiver to handle
+        Edit a receiver in the database.
+        Returns OK - id/FAIL
+ --deletereceiver &lt;id&gt;
+        id - ID of a configured receiver
+        Delete a receiver from the database.
+        This command will also delete all timers using this receiver.
+        Returns OK - &lt;id&gt;/FAIL
+ --status &lt;id&gt;
+        id (optional)- ID of a configured receiver
+                Status for all receivers will be diplayed, if omitted.
+        Returns the receiver status.
+ --reset
+        Turn off all receivers and re-initate all timers.
+        Returns OK/FAIL
+ --gettimer &lt;receiverid&gt;
+        receiverid (optional) - display information for timers set for this receiver.
+                Information for all timers will be diplayed, if omitted.
+        Returns a list of the configured timers
+        ID&lt;tab&gt;Receiver ID&lt;tab&gt;On time&lt;tab&gt;Off time&lt;tab&gt;Days&lt;tab&gt;Dim level
+ --addtimer &lt;receiverid&gt; &lt;ontime&gt; &lt;offtime&gt; &lt;daysofweek&gt; &lt;dimlevel&gt;
+        receiverid - ID of the receiver to set timer for.
+        ontime - when to activate the receiver.
+        offtime - when to deactivate the receiver.
+        Valid formats:
+                hh:mm[Rmmm] - hour:minute +RANDOM minutes. E.g. 19:30R30 = 19:31 - 20:00
+                SUNRISE|SUNSET[+-mmm] - Sunrise/Sunset +- minutes E.g. SUNSET-20
+        daysofweek - the days of the week the timer is active.
+                E.g. 1234567 - all days, 567 - Fr, Sa, Su
+        dimlevel - Set this level when activating the timer.
+                0      : No dimming, turn on full.
+                1 - 15 : Level to use
+                Setting will be ignored for non dimmable receivers.
+        Add a new timer setting for a given receiver.
+        Returns OK - id/FAIL
+ --edittimer &lt;timerid&gt; &lt;ontime&gt; &lt;offtime&gt; &lt;daysofweek&gt; &lt;dimlevel&gt;
+        timerid - ID of the timer to edit.
+        ontime - when to activate the receiver.
+        offtime - when to deactivate the receiver.
+        daysofweek - the days of the week the timer is active.
+        dimlevel - Set this level when activating the timer.
+        Examples, see --addtimer
+        Edit the settings of an existing timer.
+        Returns OK - id/FAIL
+ --deletetimer &lt;id&gt;
+        id - ID of a timer setting.
+        Delete a timer setting.
+        Returns OK/FAIL
+ --getlog &lt;lines&gt;
+        lines (optional)- Number of lines to display.
+                10 lines will be returned, if omitted.
+        Returns the last &lt;lines&gt; lines of the log.
+ --license
+        Display the license information.
+ --help
+        Display this information.
+ 
+ by Fredrik Stalhammar 2008-2012</pre>
+<p>
+</p>
+<h2><a name="lccmdusage__"><code>lccmdUsage()</code></a></h2>
+<ul>
+<li><strong><a name="parameters_none" class="item"><em>parameters: none</em></a></strong>
+
+</li>
+<li><strong><a name="returns_integer_1" class="item"><em>returns: (integer) 1</em></a></strong>
+
+</li>
+</ul>
+<p>Displays the tool help, see <a href="#lccmd">lccmd</a></p>
+<p>
+</p>
+<h2><a name="lclicenseinfo__"><code>lcLicenseInfo()</code></a></h2>
+<ul>
+<li><strong><a name="parameters_none2" class="item"><em>parameters: none</em></a></strong>
+
+</li>
+<li><strong><a name="returns_integer_12" class="item"><em>returns: (integer) 1</em></a></strong>
+
+</li>
+</ul>
+<p>Displays the tool license information.</p>
+
+</body>
+
+</html>
