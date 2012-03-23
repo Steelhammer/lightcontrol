@@ -15,7 +15,7 @@ The tools are written in Perl, on Ubuntu 10.04.
 
 lightcontrol-install.txt contains instructions for getting started.
 
-The tool is limited to the arctech protocal using self learning receivers.
+The tool is limited to the arctech protocol using self learning receivers.
 All tests have been performed using NEXA receivers.
 
 ## Other
