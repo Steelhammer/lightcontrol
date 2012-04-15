@@ -110,7 +110,7 @@ The description of the lccmd options is available through the tool help.
  		1 - 15 : Level to use
  		Setting will be ignored for non dimmable receivers.
  	Add a new timer setting for a given receiver.
- 	Returns OK - id, receiverid/FAIL
+ 	Returns OK - id/FAIL
  --edittimer <timerid> <ontime> <offtime> <daysofweek> <dimlevel>
  	timerid - ID of the timer to edit.
  	ontime - when to activate the receiver.
@@ -435,7 +435,7 @@ if ($result)
           my $newTimerId = AddNewTimer($receiverId, $onTime, $offTime, $repDays, $dimlevel);   
           if ($newTimerId)
           {
-            print "OK - $newTimerId, $receiverId\n";
+            print "OK - $newTimerId\n";
           }
           else
           {
@@ -598,7 +598,7 @@ sub lccmdUsage
   print("\t\t1 - 15 : Level to use\n");
   print("\t\tSetting will be ignored for non dimmable receivers.\n");
   print("\tAdd a new timer setting for a given receiver.\n");
-  print("\tReturns OK - id, receiverid/FAIL\n");
+  print("\tReturns OK - id/FAIL\n");
   print("--edittimer <timerid> <ontime> <offtime> <daysofweek> <dimlevel>\n");
   print("\ttimerid - ID of the timer to edit.\n");
   print("\tontime - when to activate the receiver.\n");
