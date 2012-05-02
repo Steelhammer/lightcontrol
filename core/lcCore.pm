@@ -198,8 +198,9 @@ sub AddReceiver
     PrintToLog("Adding $recType: $receiverName");
     $share->store( "Update" );
     $status = $dbh->func('last_insert_rowid');
+    UpdateSettingsTime();
   }
-  undef($dbh);  
+  undef($dbh);
   
   return $status;
 }
@@ -243,8 +244,9 @@ sub UpdateReceiver
     PrintToLog("Updating $recType: $receiverName");
     $share->store( "Update" );
     $status = 1;
+    UpdateSettingsTime();
   }
-  undef($dbh);  
+  undef($dbh);
   
   return $status;
 }
@@ -285,9 +287,10 @@ sub DeleteReceiver
       $dbh->do("DELETE FROM timers WHERE recid=$id");
       $share->store( "Update" );
       $status = $id;
+      UpdateSettingsTime();
     }
   }
-  undef($dbh);  
+  undef($dbh);
   
   return $status;
 }
@@ -581,6 +584,7 @@ sub AddNewTimer
         PrintToLog("Adding new timer to receiver '$receiverName'");
         $share->store( "Update" );
         $result = $dbh->func('last_insert_rowid');
+        UpdateSettingsTime();
       }
       undef($dbh);
     }  
@@ -644,6 +648,7 @@ sub EditTimer
           PrintToLog("Updating timer to receiver '$receiverName'");
           $share->store( "Update" );
           $result = $timerId;
+          UpdateSettingsTime();
         }
         
       }
@@ -692,6 +697,7 @@ sub DeleteTimer
       PrintToLog("Deleting timer from '$receiverName'");
       $share->store( "Update" );
       $status = $id;
+      UpdateSettingsTime();
     }
   }
   undef($dbh);  
@@ -852,5 +858,70 @@ sub PrintToLog
   
   return 1;
 }
+
+
+sub CheckForStatusUpdate
+{
+  my ($checkTime) = @_;
+  
+  my $result = "";
+  
+  my $dbh = GetDBConnection();
+  my $query = "SELECT name, time FROM statusupdate";
+  my $query_handle = $dbh->prepare($query);
+  $query_handle->execute();
+  $query_handle->bind_columns(\my($name, $updatetime));
+  
+  my $settingsUpdateTime = undef;
+  my $statusUpdateTime = undef;
+  
+  while($query_handle->fetch())
+  {
+    #print "$name, $updatetime\n";
+    if ($name eq "settings")
+    {
+      $settingsUpdateTime = $updatetime;
+    }
+    elsif ($name eq "status")
+    {
+      $statusUpdateTime = $updatetime;
+    } 
+  }
+  $query_handle->finish;
+  undef($dbh);
+  
+  if (defined($settingsUpdateTime) and defined($statusUpdateTime))
+  {
+    if ($settingsUpdateTime > $checkTime)
+    {
+      $result = "Settings updated";
+    }
+    elsif ($statusUpdateTime > $checkTime)
+    {
+      $result = "Status updated";
+    }
+    else
+    {
+      $result = "No update";
+    } 
+  }
+  
+  
+  
+  return $result;
+}
+
+sub UpdateSettingsTime
+{  
+  my $dbh = GetDBConnection();
+  my $timeNow = time();
+  $dbh->do("INSERT OR IGNORE INTO statusupdate (name, time) values ('settings', $timeNow)");
+  $dbh->do("UPDATE statusupdate SET time = $timeNow WHERE name='settings'");
+  undef($dbh);
+}
+
+
+
+
 
 1;

@@ -430,6 +430,9 @@ sub turnOn
     {
       my $dbh = main::GetDBConnection();
       $dbh->do("UPDATE receivers SET status='On' WHERE id=$id");
+      my $timeNow = time();
+      $dbh->do("INSERT OR IGNORE INTO statusupdate (name, time) values ('status', $timeNow)");
+      $dbh->do("UPDATE statusupdate SET time = $timeNow WHERE name='status'");
       undef($dbh);
     }
     return $result;
@@ -475,6 +478,10 @@ sub turnOff
   {
     my $dbh = main::GetDBConnection();
     $dbh->do("UPDATE receivers SET status='Off' WHERE id=$id");
+    my $timeNow = time();
+    $dbh->do("INSERT OR IGNORE INTO statusupdate (name, time) values ('status', $timeNow)");
+    $dbh->do("UPDATE statusupdate SET time = $timeNow WHERE name='status'");
+
     undef($dbh);
   }
   return $result
@@ -536,6 +543,9 @@ sub dim
       {
         $dbh->do("UPDATE receivers SET status='On' WHERE id=$id");
       }
+      my $timeNow = time();
+      $dbh->do("INSERT OR IGNORE INTO statusupdate (name, time) values ('status', $timeNow)");
+      $dbh->do("UPDATE statusupdate SET time = $timeNow WHERE name='status'");
       undef($dbh);
     }
     
@@ -581,6 +591,9 @@ sub learn
   {
     my $dbh = main::GetDBConnection();
     $dbh->do("UPDATE receivers SET learned=1 WHERE id=$id");
+    my $timeNow = time();
+    $dbh->do("INSERT OR IGNORE INTO statusupdate (name, time) values ('settings', $timeNow)");
+    $dbh->do("UPDATE statusupdate SET time = $timeNow WHERE name='settings'");
     undef($dbh);
   }
   return $result;

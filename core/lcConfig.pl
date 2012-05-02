@@ -134,6 +134,14 @@ sub GetDBConnection
           onaction INTEGER
          )"
         );
+        
+  $dbh->do("CREATE TABLE IF NOT EXISTS statusupdate 
+         (
+          id INTEGER PRIMARY KEY,
+          name TEXT UNIQUE, 
+          time INTEGER
+         )"
+        );
           
   $dbh->{PrintError} = 0;
   

@@ -159,30 +159,34 @@ my @edittimer_opt;
 my $deltimer_opt;
 
 my $getlog_opt;
+my $getstatus_opt;
 my $getlicense_opt;
 my $help_opt;
 
 my %userPrefs = GetConfiguration();
 
-my $result = GetOptions('on=i'                      => \$recon_opt,    #OK
-                        'off=i'                     => \$recoff_opt,   #OK
-                        'dim=s{2}'                  => \@recdim_opt,   #OK
-                        'learn=s'                   => \$reclearn_opt, #OK
-                        'getreceiver:i'             => \$getrec_opt,   #OK
-                        'addreceiver=s{2}'          => \@addrec_opt,   #OK
-                        'editreceiver=s{3}'         => \@editrec_opt,  #OK
-                        'deletereceiver=s'          => \$delrec_opt,   #OK
-                        'status:i'                  => \$getrecstatus_opt,    #OK
-                        'reset'                     => \$resetstatus_opt,     #OK
+my $result = GetOptions('on=i'                      => \$recon_opt,
+                        'off=i'                     => \$recoff_opt,
+                        'dim=s{2}'                  => \@recdim_opt,
+                        'learn=s'                   => \$reclearn_opt,
+                        'getreceiver:i'             => \$getrec_opt,
+                        'addreceiver=s{2}'          => \@addrec_opt,
+                        'editreceiver=s{3}'         => \@editrec_opt,
+                        'deletereceiver=s'          => \$delrec_opt,
+                        'status:i'                  => \$getrecstatus_opt,
+                        'reset'                     => \$resetstatus_opt,
                         
-                        'gettimer:i'                => \$gettimer_opt,    #OK
-                        'addtimer=s{5}'             => \@addtimer_opt,    #OK
-                        'edittimer=s{5}'            => \@edittimer_opt,   #OK
-                        'deletetimer=s'             => \$deltimer_opt,    #OK
+                        'gettimer:i'                => \$gettimer_opt,
+                        'addtimer=s{5}'             => \@addtimer_opt,
+                        'edittimer=s{5}'            => \@edittimer_opt,
+                        'deletetimer=s'             => \$deltimer_opt,
                         
-                        'getlog:i'                  => \$getlog_opt, #OK
+                        'getlog:i'                  => \$getlog_opt,
+                        
+                        'checkforupdate=i'          => \$getstatus_opt,
+                        
                         'license'                   => \$getlicense_opt, 
-                        'help'                      => \$help_opt);  #OK
+                        'help'                      => \$help_opt);
 
 
 if ($result)
@@ -204,7 +208,8 @@ if ($result)
        @edittimer_opt xor
        defined($deltimer_opt) xor  
        defined($getlicense_opt) xor
-       defined($getlog_opt)
+       defined($getlog_opt) xor
+       defined($getstatus_opt)
      )
   {
     if (defined($help_opt))
@@ -501,6 +506,18 @@ if ($result)
       $getlog_opt = $getlog_opt ? $getlog_opt : 10;
       my $logText = GetLog($getlog_opt);
       print $logText;
+    }
+    elsif (defined($getstatus_opt))
+    {
+      my $status = CheckForStatusUpdate($getstatus_opt);
+      if ($status)
+      {
+        print "OK - $status\n";
+      }
+      else
+      {
+        print "FAIL - Command failed\n";
+      }
     }
   }
   else
