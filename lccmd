@@ -128,6 +128,10 @@ The description of the lccmd options is available through the tool help.
  	lines (optional)- Number of lines to display.
  		10 lines will be returned, if omitted.
  	Returns the last <lines> lines of the log.
+--checkforupdate <timestamp>
+	timestamp - UNIX timestamp.
+	Check if status/settings are updated after <timestamp>.
+	Returns OK - (Settings updated/Status updated/No update)/FAIL
  --license
  	Display the license information.
  --help
@@ -633,6 +637,10 @@ sub lccmdUsage
   print("\tlines (optional)- Number of lines to display.\n");
   print("\t\t10 lines will be returned, if omitted.\n");
   print("\tReturns the last <lines> lines of the log.\n");
+  print("--checkforupdate <timestamp>\n");
+  print("\ttimestamp - UNIX timestamp.\n");
+  print("\tCheck if status/settings are updated after <timestamp>.\n");
+  print("\tReturns OK - (Settings updated/Status updated/No update)/FAIL\n");
   print("--license\n");
   print("\tDisplay the license information.\n");
   print("--help\n");
