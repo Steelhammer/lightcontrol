@@ -47,6 +47,8 @@
 
 		<li><a href="#getlog__"><code>GetLog()</code></a></li>
 		<li><a href="#printtolog__"><code>PrintToLog()</code></a></li>
+		<li><a href="#checkforstatusupdate__"><code>CheckForStatusUpdate()</code></a></li>
+		<li><a href="#updatesettingstime__"><code>UpdateSettingsTime()</code></a></li>
 	</ul>
 
 </ul>
@@ -383,6 +385,33 @@ If $nbrEntries = 0 the last 10 lines will be returned.</p>
 </ul>
 <p>Print an entry to the application log. 
 Time stamp and new line will be added automatically.</p>
+<p>
+</p>
+<h2><a name="checkforstatusupdate__"><code>CheckForStatusUpdate()</code></a></h2>
+<ul>
+<li><strong><a name="parameters14" class="item"><em>parameters:</em></a></strong>
+
+<p>$checkTime (integer) - UNIX timestamp to compare update time with.</p>
+</li>
+<li><strong><a name="returns_status_updated_settings_updated_no_update" class="item"><em>returns: Status updated/Settings updated/No update</em></a></strong>
+
+</li>
+</ul>
+<p>Check database for last update of status and settings.
+Compare the update time to  $checkTime, return the update information.
+If both status and settings are updated, 'Settings updated' will be returned.</p>
+<p>
+</p>
+<h2><a name="updatesettingstime__"><code>UpdateSettingsTime()</code></a></h2>
+<ul>
+<li><strong><a name="parameters_none2" class="item"><em>parameters: None</em></a></strong>
+
+</li>
+<li><strong><a name="returns_nothing" class="item"><em>returns: Nothing</em></a></strong>
+
+</li>
+</ul>
+<p>Set the settings update time to current time.</p>
 
 </body>
 

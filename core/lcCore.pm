@@ -859,6 +859,23 @@ sub PrintToLog
   return 1;
 }
 
+=head2 CheckForStatusUpdate()
+
+=over 2
+
+=item * I<parameters:>
+
+$checkTime (integer) - UNIX timestamp to compare update time with. 
+
+=item * I<returns: Status updated/Settings updated/No update>
+
+=back
+
+Check database for last update of status and settings.
+Compare the update time to  $checkTime, return the update information.
+If both status and settings are updated, 'Settings updated' will be returned.
+
+=cut
 
 sub CheckForStatusUpdate
 {
@@ -911,6 +928,20 @@ sub CheckForStatusUpdate
   return $result;
 }
 
+=head2 UpdateSettingsTime()
+
+=over 2
+
+=item * I<parameters: None>
+
+=item * I<returns: Nothing>
+
+=back
+
+Set the settings update time to current time.
+
+=cut
+
 sub UpdateSettingsTime
 {  
   my $dbh = GetDBConnection();
@@ -919,9 +950,6 @@ sub UpdateSettingsTime
   $dbh->do("UPDATE statusupdate SET time = $timeNow WHERE name='settings'");
   undef($dbh);
 }
-
-
-
 
 
 1;
