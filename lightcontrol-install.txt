@@ -5,7 +5,7 @@ note: only Archtech protocol supported, all tests performed using NEXA receivers
 
 install sqlite
 
-install the following modules from cpan (or other package respoitory):
+install the following modules from cpan (or other package repository):
 * DateTime (Synaptic: libdatetime-perl)
 * IPC::ShareLite (Synaptic: libipc-sharelite-perl)
 * DateTime::Event::Sunrise (Synaptic: libdatetime-event-sunrise-perl)
