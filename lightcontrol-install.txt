@@ -1,8 +1,9 @@
 lightcontrol control app installation
 -----------------------------------
 
-note: only NEXA receivers supported (PROOVE receivers use the same protocol, untested)
+note: only Archtech protocol supported, all tests performed using NEXA receivers.
 
+install sqlite
 
 install the following modules from cpan (or other package respoitory):
 * DateTime (Synaptic: libdatetime-perl)
@@ -13,8 +14,8 @@ install the following modules from cpan (or other package respoitory):
 * DBI (Synaptic: libdbi-perl)
 * DBD::SQLite (Synaptic: libdbd-sqlite3-perl)
 
-unpack the lightcontrol zip file.
-rename the containing folder to lightcontrol, i.e remove the version number to make upgrade easier.
+clone the git/unpack the lightcontrol zip file.
+(re)name the containing folder to lightcontrol or something else you like, lightcontrol is assumed below.
 
 make links from /usr/share/perl5 (or other folder in the perl path) to:
 .../lightcontrol/core/lcReceiver.pm
@@ -33,7 +34,7 @@ the db file and the containing folder must be writeable by the users that will e
 
 copy .../lightcontrol/lightcontrol.conf to /etc/lctimer/.
 
-Add a link from a folder in the bin path (e.g. /usr/bin )to .../lightcontrol/tscmd
+Add a link from a folder in the bin path (e.g. /usr/bin )to .../lightcontrol/lccmd
 
 Create the following file:
 /etc/udev/rules.d/99-tellstick.rules    containing this line:
