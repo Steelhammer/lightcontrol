@@ -38,7 +38,7 @@ Add a link from a folder in the bin path (e.g. /usr/bin )to .../lightcontrol/lcc
 
 Create the following file:
 /etc/udev/rules.d/99-tellstick.rules    containing this line:
-KERNEL=="ttyUSB*", BUS=="usb", SYSFS{idVendor}=="1781", SYSFS{idProduct}=="0c30", MODE="0666", NAME="tellstick"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="1781", ATTRS{idProduct}=="0c30", MODE="0666", SYMLINK+="tellstick"
 
 start .../lightcontrol/lctimerd.pl
 
